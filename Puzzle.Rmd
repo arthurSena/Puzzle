@@ -21,15 +21,24 @@ for (i in 1:108){
 train_data <- train_data[,temp]
 
 #Trainning my models
-train_data$target<- as.factor(train_data$target) 
+
+
 
 inTraining <- createDataPartition(train_data$target, p = .75, list = FALSE)
 training <- train_data[ inTraining,]
 testing  <- train_data[-inTraining,]
 
-control <- trainControl(method="repeatedcv", number=3, repeats=2) 
+train_data$target<- as.factor(train_data$target) 
+testing$target<- as.factor(testing$target) 
+
+testing <- testing[complete.cases(testing),]
+
+control <- trainControl(method="repeatedcv", number=2, repeats=2) 
 knn_grid = expand.grid(k=c(1:20))
-knn_model = train(target~.,  data=training ,method="knn",preProcess=c("range"),tuneGrid = knn_grid,trControl=control, na.action=na.omit)
+knn_model = train(target~.,  data=training ,method="knn",preProcess=c("range"),tuneGrid = knn_grid,trControl=control, na.action=na.omit, metric = "Rsquared")
+
+knnPredict <- predict(knn_model,newdata = testing)
+confusionMatrix(knnPredict, testing$target)
 
 filtered_train <- dat
 
