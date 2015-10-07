@@ -1,0 +1,40 @@
+---
+title: "Puzzle"
+author: "Arthur Sena"
+date: "10/07/2015"
+output: html_document
+---
+
+```{r}
+
+library(caret)
+train_data <- read.csv("Data/train.csv")
+
+#Removing SHA-256 columns from the train_data
+temp <- c()
+for (i in 1:108){
+  print(i)
+  if(length(levels(train_data[,i])) == 0){
+    temp <- c(temp,i)
+  }
+}
+train_data <- train_data[,temp]
+
+#Trainning my models
+train_data$target<- as.factor(train_data$target) 
+
+inTraining <- createDataPartition(train_data$target, p = .75, list = FALSE)
+training <- train_data[ inTraining,]
+testing  <- train_data[-inTraining,]
+
+control <- trainControl(method="repeatedcv", number=3, repeats=2) 
+knn_grid = expand.grid(k=c(1:20))
+knn_model = train(target~.,  data=training ,method="knn",preProcess=c("range"),tuneGrid = knn_grid,trControl=control, na.action=na.omit)
+
+filtered_train <- dat
+
+
+
+
+```
+
